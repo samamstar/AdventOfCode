@@ -1,6 +1,6 @@
 
 data = []
-with open("/home/sam/Git/AdventOfCode/2024/prompt2.txt") as f:
+with open("2024/prompts/2p.txt") as f:
     for line in f:
         splitLine = line.split()
         numLine = []

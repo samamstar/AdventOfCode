@@ -2,7 +2,7 @@ import fileinput
 
 firstList = []
 secondList = []
-with open("/home/sam/Git/AdventOfCode/2024/prompt1.txt") as f:
+with open("2024/prompts/1p.txt") as f:
     for line in f:
         splitLine = line.split()
         firstList.append(splitLine[0])

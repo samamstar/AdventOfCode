@@ -1,6 +1,6 @@
 import re
 
-with open("/home/sam/Git/AdventOfCode/2024/3/prompt.txt") as f:
+with open("2024/prompts/3p.txt") as f:
     stream = f.read()
 
 total = 0
