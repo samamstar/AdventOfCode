@@ -84,60 +84,63 @@ def getRegionSides(region):
 
 
 # Returns false if invalid interior region (Ran into edge of map)
-def checkInteriorPoint(region, x, y, checked, foundOutside, minx, miny, maxx, maxy):
+def checkInteriorPoint(region, x, y, checked, foundOutside, bounds):
     if (x, y) in checked:
         return
     checked.add((x, y))
     region.append((x, y))
-    if x == minx or y == miny or y == maxy or x == maxx:
-        # Shitty hack to return a value but continue flood fill
+    if x == bounds.get("minx") or y == bounds.get("miny") or y == bounds.get("maxy") or x == bounds.get("maxx"):
         foundOutside[0] = True
-    if y > miny:
+    if y > bounds.get("miny"):
         checkInteriorPoint(region, x, y - 1, checked,
-                           foundOutside, minx, miny, maxx, maxy)
-    if x > minx:
+                           foundOutside, bounds)
+    if x > bounds.get("minx"):
         checkInteriorPoint(region, x - 1, y, checked,
-                           foundOutside, minx, miny, maxx, maxy)
-    if y < maxy:
+                           foundOutside, bounds)
+    if y < bounds.get("maxy"):
         checkInteriorPoint(region, x, y+1, checked,
-                           foundOutside, minx, miny, maxx, maxy)
-    if x < maxx:
+                           foundOutside, bounds)
+    if x < bounds.get("maxx"):
         checkInteriorPoint(region, x + 1, y, checked,
-                           foundOutside, minx, miny, maxx, maxy)
+                           foundOutside, bounds)
 
-# Outer sides of interior regions should match interior sides of the void space
+def findBoundaryPoints(region):
+    minx = region[0][0]
+    maxx = region[0][0]
+    miny = region[0][1]
+    maxy = region[0][1]
+    for point in region:
+        if point[0] < minx:
+            minx = point[0]
+        if point[0] > maxx:
+            maxx = point[0]
+        if point[1] < miny:
+            miny = point[0]
+        if point[1] > maxy:
+            maxy = point[0]
+    result = {}
+    result["minx"] = minx
+    result["miny"] = miny
+    result["maxx"] = maxx
+    result["maxy"] = maxy
+    return result
 
 
 def findInteriorRegions(outerRegion):
     regions = []
     checked = set()
-    for point in region:
+    for point in outerRegion:
         checked.add(point)
-    minx = region[0][0]
-    for point in outerRegion:
-        if point[0] < minx:
-            minx = point[0]
-    maxx = region[0][0]
-    for point in outerRegion:
-        if point[0] > maxx:
-            maxx = point[0]
-    miny = region[0][1]
-    for point in outerRegion:
-        if point[1] < miny:
-            miny = point[0]
-    maxy = region[0][1]
-    for point in outerRegion:
-        if point[1] > maxy:
-            maxy = point[0]
 
-    for y in range(miny, maxy+1):
-        for x in range(minx, maxx+1):
+    bounds = findBoundaryPoints(outerRegion)
+    for y in range(bounds.get("miny"), bounds.get("maxy")):
+        for x in range(bounds.get("minx"), bounds.get("maxx")):
             if (x, y) in checked:
                 continue
             newRegion = []
             foundOutside = [False]
             checkInteriorPoint(newRegion, x, y, checked,
-                               foundOutside, minx, miny, maxx, maxy)
+                               foundOutside, bounds)
             if not foundOutside[0]:
                 regions.append(newRegion)
                 print("Found interior region of size", len(newRegion))
