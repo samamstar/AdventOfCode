@@ -7,6 +7,7 @@ with open("2024/prompts/12p.txt") as f:
 checked = set()
 
 
+# Stefan says recursion is bad. Doesn't work in part 2 (For good reason)
 def checkPoint(region, x, y, shouldBe):
     if (x, y) in checked:
         return
@@ -83,68 +84,44 @@ def getRegionSides(region):
     return sides
 
 
-# Returns false if invalid interior region (Ran into edge of map)
-def checkInteriorPoint(region, x, y, checked, foundOutside, bounds):
-    if (x, y) in checked:
-        return
-    checked.add((x, y))
-    region.append((x, y))
-    if x == bounds.get("minx") or y == bounds.get("miny") or y == bounds.get("maxy") or x == bounds.get("maxx"):
-        foundOutside[0] = True
-    if y > bounds.get("miny"):
-        checkInteriorPoint(region, x, y - 1, checked,
-                           foundOutside, bounds)
-    if x > bounds.get("minx"):
-        checkInteriorPoint(region, x - 1, y, checked,
-                           foundOutside, bounds)
-    if y < bounds.get("maxy"):
-        checkInteriorPoint(region, x, y+1, checked,
-                           foundOutside, bounds)
-    if x < bounds.get("maxx"):
-        checkInteriorPoint(region, x + 1, y, checked,
-                           foundOutside, bounds)
-
-def findBoundaryPoints(region):
-    minx = region[0][0]
-    maxx = region[0][0]
-    miny = region[0][1]
-    maxy = region[0][1]
-    for point in region:
-        if point[0] < minx:
-            minx = point[0]
-        if point[0] > maxx:
-            maxx = point[0]
-        if point[1] < miny:
-            miny = point[0]
-        if point[1] > maxy:
-            maxy = point[0]
-    result = {}
-    result["minx"] = minx
-    result["miny"] = miny
-    result["maxx"] = maxx
-    result["maxy"] = maxy
-    return result
-
-
 def findInteriorRegions(outerRegion):
-    regions = []
+    newRegions = []
     checked = set()
     for point in outerRegion:
         checked.add(point)
 
-    bounds = findBoundaryPoints(outerRegion)
-    for y in range(bounds.get("miny"), bounds.get("maxy")):
-        for x in range(bounds.get("minx"), bounds.get("maxx")):
-            if (x, y) in checked:
-                continue
+    for y in range(len(map)):
+        for x in range(len(map[0])):
+            search = [(x,y)]
+            isInterior = True
             newRegion = []
-            foundOutside = [False]
-            checkInteriorPoint(newRegion, x, y, checked,
-                               foundOutside, bounds)
-            if not foundOutside[0]:
-                regions.append(newRegion)
-                print("Found interior region of size", len(newRegion))
-    return regions
+            while len(search)>0:
+                point = search.pop()
+                if point in checked:
+                    continue
+                checked.add(point)
+                newRegion.append(point)
+                pointx = point[0]
+                pointy = point[1]
+                if pointx > 0:
+                    search.append((pointx-1,pointy))
+                else:
+                    isInterior = False
+                if pointx < len(map[0])-1:
+                    search.append((pointx+1,pointy))
+                else:
+                    isInterior = False
+                if pointy > 0:
+                    search.append((pointx,pointy-1))
+                else:
+                    isInterior = False
+                if pointy < len(map)-1:
+                    search.append((pointx,pointy+1))
+                else:
+                    isInterior = False
+            if len(newRegion) > 0 and isInterior:
+                newRegions.append(newRegion)
+    return newRegions
 
 
 total = 0
