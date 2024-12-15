@@ -1,6 +1,6 @@
 grid = []
 commands = []
-with open("2024/prompts/15ps.txt") as f:
+with open("2024/prompts/15p.txt") as f:
     for line in f:
         if line == "\n":
             break
@@ -106,7 +106,6 @@ for x in range(0, width):
             botPos = [x, y]
 
 for command in commands:
-    printGrid(grid2)
     match command:
         case "^":
             direction = 0
@@ -121,7 +120,7 @@ for command in commands:
     shiftPoints = []
     while True:
         clear = True
-        for i, checkPoint in enumerate(checkPoints):
+        for i, checkPoint in enumerate(checkPoints.copy()):
             shiftPoints.append((checkPoint, getPoint(checkPoint, grid2)))
             nextPoint = movePoint(checkPoint, direction)
             nextVal = getPoint(nextPoint, grid2)
@@ -138,14 +137,28 @@ for command in commands:
                         checkPoints.append(movePoint(nextPoint, 3))
             if not nextVal == ".":
                 clear = False
+        toRemove = []
+        for checkPoint in checkPoints:
+            if getPoint(checkPoint, grid2) == ".":
+                toRemove.append(checkPoint)
+        for point in toRemove:
+            checkPoints.remove(point)
         if bonked or clear:
             break
     if bonked == True:
         continue
     backwards = (direction+2) % 4
-    for pointInfo in shiftPoints:
+    for pointInfo in reversed(shiftPoints):
         setPoint(movePoint(pointInfo[0], direction), pointInfo[1], grid2)
-        if pointInfo[0][1] == botPos[1] and direction in [0,2]:
-            setPoint(pointInfo[0], ".", grid2)
-    setPoint(botPos,".",grid2)
+        setPoint(pointInfo[0], ".", grid2)
+    setPoint(botPos, ".", grid2)
     botPos = movePoint(botPos, direction)
+    setPoint(botPos, "@", grid2)
+
+total = 0
+for x in range(width):
+    for y in range(height):
+        if getPoint([x, y], grid2) == "[":
+            total += 100 * y
+            total += x
+print("Part2:", total)
