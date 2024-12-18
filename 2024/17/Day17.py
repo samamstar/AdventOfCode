@@ -19,6 +19,10 @@ def readCombo(operand):
     elif operand == 6:
         return regC
 
+def asBinaryString(val):
+    result = "{:03b}".format(val)
+    result = "0"*(len(result)%3) + result
+    return result
 
 output = []
 instructionPointer = 0
@@ -46,6 +50,9 @@ while (instructionPointer < len(program)):
             regB = int(regA/2**readCombo(operand))
         case 7:
             regC = int(regA/2**readCombo(operand))
+    print("Pointer:", instructionPointer)
+    print("RegA:", asBinaryString(regA))
+    print("RegB:", asBinaryString(regB))
 
 # Thanks SO! I should learn list comprehension...
 print("Part1:", ",".join([str(x) for x in output]))
@@ -103,11 +110,21 @@ Restart if A > 0
 
 # I think I need to solve this problem differently
 
-finalA = 0
-for outVal in reversed(program):
-    finalA *= 8
+# Boxman says that you can consider the output one triplet at a time
+# Uh... Oh yeah I see maybe (JK He's crazy I don't see.)
 
-    while(finalA):
-        pass
-    
-print("Part2:", finalA)
+def assessPossibleAList(aList):
+    output = []
+    A = aListToInt
+    while A != 0:
+        B = A%8
+        B = B^3
+        
+
+def aListToInt(aList):
+    result = 0
+    for i, value in enumerate(reversed(aList)):
+        result += value * 8**i
+    return result
+
+ 
