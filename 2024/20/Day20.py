@@ -54,6 +54,7 @@ for y in range(len(grid)):
             goal = x, y
 toCheck = [start]
 nodeScores = {start: 0}
+# Generates a list of all valid (non-#) points and puts their distance from S into nodeScores
 while (len(toCheck)):
     current = toCheck.pop(0)
     point = current
@@ -71,10 +72,10 @@ while (len(toCheck)):
             nodeScores[nextPoint] = nextScore
             toCheck.append(nextPoint)
 
-cheats = {}
 
 cheatResults = {}
 transforms = ((-2, 0), (0, -2), (2, 0), (0, 2))
+# For each node in nodeScores, checks the points 2 away in each cardinal direction for if it's a valid node, then checks if our cheat to get there actually saved time
 for properStart in nodeScores.keys():
     for transform in transforms:
         cheatStart = (properStart[0]+transform[0], properStart[1]+transform[1])
@@ -93,7 +94,6 @@ for save in sorted(cheatResults.keys()):
         total += len(cheatResults.get(save))
 print("Part1:", total)
 
-cheats = {}
 
 cheatResults = {}
 transforms = []
@@ -103,6 +103,7 @@ for x in range (-20,21):
             continue
         transforms.append((x,y))
 
+# Same as part 1's solution, but checks all points within the diamond reachable by a 20 step cheat
 for properStart in nodeScores.keys():
     for transform in transforms:
         cheatStart = (properStart[0]+transform[0], properStart[1]+transform[1])
